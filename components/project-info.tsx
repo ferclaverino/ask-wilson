@@ -18,7 +18,7 @@ export const ProjectInfo = () => {
             AI SDK
           </Link>{" "}
           to allow you to query a PostgreSQL database with natural language. The
-          dataset consists of Wilson's sensors logs.
+          dataset consists of Wilson&apos;s sensors logs.
           <div className="mt-4 sm:hidden">
             <DeployButton />
           </div>
