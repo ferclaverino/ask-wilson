@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 
 export const metadata = {
   metadataBase: new URL("https://ask-wilson.vercel.app/"),
-  title: "Aks Wilson",
+  title: "Ask Wilson",
   description:
     "Chat with a Wilson logs using natural language powered by the AI SDK by Vercel.",
 };
