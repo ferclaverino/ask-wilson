@@ -13,42 +13,24 @@ export const generateQuery = async (input: string) => {
       model: openai("gpt-4o"),
       system: `You are a SQL (postgres) and data visualization expert. Your job is to help the user write a SQL query to retrieve the data they need. The table schema is as follows:
 
-      unicorns (
-      id SERIAL PRIMARY KEY,
-      company VARCHAR(255) NOT NULL UNIQUE,
-      valuation DECIMAL(10, 2) NOT NULL,
-      date_joined DATE,
-      country VARCHAR(255) NOT NULL,
-      city VARCHAR(255) NOT NULL,
-      industry VARCHAR(255) NOT NULL,
-      select_investors TEXT NOT NULL
+    sensors (
+      timestamp timestamp NOT NULL,
+      sensor1_volume DECIMAL(10, 2) NOT NULL,
+      sensor1_flow DECIMAL(10, 2) NOT NULL
     );
 
     Only retrieval queries are allowed.
 
-    For things like industry, company names and other string fields, use the ILIKE operator and convert both the search term and the field to lowercase using LOWER() function. For example: LOWER(industry) ILIKE LOWER('%search_term%').
+    Table contains a timestamp field and sensors values for a machine called Wilson.
 
-    Note: select_investors is a comma-separated list of investors. Trim whitespace to ensure you're grouping properly. Note, some fields may be null or have only one value.
-    When answering questions about a specific field, ensure you are selecting the identifying column (ie. what is Vercel's valuation would select company and valuation').
+    The field sensor1_volume is the volume measured by sensor 1. It is in milli liters.
+    The field sensor1_flow is the flow measured by sensor 1. It is in milli liters per minute.
+    
+    When there are no values registered by sensors, wilson is not working. Otherwise it is working.
 
-    The industries available are:
-    - healthcare & life sciences
-    - consumer & retail
-    - financial services
-    - enterprise tech
-    - insurance
-    - media & entertainment
-    - industrials
-    - health
+    A working period starts when sensor values are >= 0 and ends on the previous record that sensor value is equal to 0.
 
-    If the user asks for a category that is not in the list, infer based on the list above.
-
-    Note: valuation is in billions of dollars so 10b would be 10.0.
-    Note: if the user asks for a rate, return it as a decimal. For example, 0.1 would be 10%.
-
-    If the user asks for 'over time' data, return by year.
-
-    When searching for UK or USA, write out United Kingdom or United States respectively.
+    When user asks for minimim values, exclude 0.
 
     EVERY QUERY SHOULD RETURN QUANTITATIVE DATA THAT CAN BE PLOTTED ON A CHART! There should always be at least two columns. If the user asks for a single column, return the column and the count of the column. If the user asks for a rate, return the rate as a decimal. For example, 0.1 would be 10%.
     `,
@@ -86,9 +68,9 @@ export const runGenerateSQLQuery = async (query: string) => {
   try {
     data = await sql.query(query);
   } catch (e: any) {
-    if (e.message.includes('relation "unicorns" does not exist')) {
+    if (e.message.includes('relation "sensors" does not exist')) {
       console.log(
-        "Table does not exist, creating and seeding it with dummy data now...",
+        "Table does not exist, creating and seeding it with dummy data now..."
       );
       // throw error
       throw Error("Table does not exist");
@@ -109,18 +91,13 @@ export const explainQuery = async (input: string, sqlQuery: string) => {
         explanations: explanationsSchema,
       }),
       system: `You are a SQL (postgres) expert. Your job is to explain to the user write a SQL query you wrote to retrieve the data they asked for. The table schema is as follows:
-    unicorns (
-      id SERIAL PRIMARY KEY,
-      company VARCHAR(255) NOT NULL UNIQUE,
-      valuation DECIMAL(10, 2) NOT NULL,
-      date_joined DATE,
-      country VARCHAR(255) NOT NULL,
-      city VARCHAR(255) NOT NULL,
-      industry VARCHAR(255) NOT NULL,
-      select_investors TEXT NOT NULL
+    sensors (
+      timestamp timestamp NOT NULL,
+      sensor1_volume DECIMAL(10, 2) NOT NULL,
+      sensor1_flow DECIMAL(10, 2) NOT NULL
     );
 
-    When you explain you must take a section of the query, and then explain it. Each "section" should be unique. So in a query like: "SELECT * FROM unicorns limit 20", the sections could be "SELECT *", "FROM UNICORNS", "LIMIT 20".
+    When you explain you must take a section of the query, and then explain it. Each "section" should be unique. So in a query like: "SELECT * FROM sensors limit 20", the sections could be "SELECT *", "FROM SENSORS", "LIMIT 20".
     If a section doesnt have any explanation, include it, but leave the explanation empty.
 
     `,
@@ -141,7 +118,7 @@ export const explainQuery = async (input: string, sqlQuery: string) => {
 
 export const generateChartConfig = async (
   results: Result[],
-  userQuery: string,
+  userQuery: string
 ) => {
   "use server";
   const system = `You are a data visualization expert. `;

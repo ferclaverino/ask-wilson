@@ -1,4 +1,4 @@
-import { Config, Result, Unicorn } from "@/lib/types";
+import { Config, Result, Sensor } from "@/lib/types";
 import { DynamicChart } from "./dynamic-chart";
 import { SkeletonCard } from "./skeleton-card";
 import {
@@ -24,31 +24,31 @@ export const Results = ({
     return title
       .split("_")
       .map((word, index) =>
-        index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word,
+        index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
       )
       .join(" ");
   };
 
   const formatCellValue = (column: string, value: any) => {
-    if (column.toLowerCase().includes("valuation")) {
-      const parsedValue = parseFloat(value);
-      if (isNaN(parsedValue)) {
-        return "";
-      }
-      const formattedValue = parsedValue.toFixed(2);
-      const trimmedValue = formattedValue.replace(/\.?0+$/, "");
-      return `$${trimmedValue}B`;
-    }
-    if (column.toLowerCase().includes("rate")) {
-      const parsedValue = parseFloat(value);
-      if (isNaN(parsedValue)) {
-        return "";
-      }
-      const percentage = (parsedValue * 100).toFixed(2);
-      return `${percentage}%`;
-    }
+    // if (column.toLowerCase().includes("valuation")) {
+    //   const parsedValue = parseFloat(value);
+    //   if (isNaN(parsedValue)) {
+    //     return "";
+    //   }
+    //   const formattedValue = parsedValue.toFixed(2);
+    //   const trimmedValue = formattedValue.replace(/\.?0+$/, "");
+    //   return `$${trimmedValue}B`;
+    // }
+    // if (column.toLowerCase().includes("rate")) {
+    //   const parsedValue = parseFloat(value);
+    //   if (isNaN(parsedValue)) {
+    //     return "";
+    //   }
+    //   const percentage = (parsedValue * 100).toFixed(2);
+    //   return `${percentage}%`;
+    // }
     if (value instanceof Date) {
-      return value.toLocaleDateString();
+      return `${value.toLocaleDateString()} ${value.toLocaleTimeString()}`;
     }
     return String(value);
   };
@@ -92,7 +92,7 @@ export const Results = ({
                       >
                         {formatCellValue(
                           column,
-                          company[column as keyof Unicorn],
+                          company[column as keyof Sensor]
                         )}
                       </TableCell>
                     ))}

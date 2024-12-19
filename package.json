@@ -1,9 +1,7 @@
 {
-  "name": "postgres-starter",
-  "repository": "https://github.com/vercel/examples.git",
+  "name": "ask-wilson",
   "license": "MIT",
   "version": "0.0.0",
-  "private": true,
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
